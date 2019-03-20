@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using Microsoft.AspNetCore.Routing;
 
 namespace HelloWorld
 {
@@ -27,8 +28,8 @@ namespace HelloWorld
         //配置服务
         public void ConfigureServices(IServiceCollection services)
         {
-
-           // services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
+            //添加MVC服务，才能使用MVC的Controller
+            services.AddMvc();
         }
 
         /*
@@ -51,8 +52,12 @@ namespace HelloWorld
             }
 
             //UseFileServer是对UseDefaultFiles和UseStaticFiles的封装，搞不清楚UseDefaultFiles和UseStaticFiles顺序时用UseFileServer
+            //静态文件放到wwwroot文件夹下面
             app.UseFileServer();
 
+            //app.UseMvcWithDefaultRoute() 给了一个默认的路由规则，允许我们访问 HomeController
+            //app.UseMvcWithDefaultRoute();
+            app.UseMvc(ConfigureRoute);
 
             //UseDefaultFiles 中间件会检查传入的请求并检查它是否用于目录的根目录，以及是否有任何匹配的默认文件
             //可以自己重写UseDefaultFiles的默认文件index.html默认是是默认文件之一
@@ -70,17 +75,27 @@ namespace HelloWorld
              * app.Run() 方法中注册的中间件还可以访问 Response，例如使用 Response 对象返回一个字符串
              * 如果在 app.Run() 方法之后注册另一个中间件，那么注册的那个中间件永远不会被调用，因为 Run() 方法是注册中间件的终端，在它之后，永远不会调用下一个中间件
              */
-            //app.Run(async (context) =>
-            //{
-            //    //throw new Exception("Throw Exception");
+            app.Run(async (context) =>
+            {
+                //throw new Exception("Throw Exception");
 
-            //    //await context.Response.WriteAsync("Hello World! 简单教程");
+                //await context.Response.WriteAsync("Hello World! 简单教程");
 
-            //    //利用了AppSettings.json文件中的值
-            //    var msg = Configuration["message"];
+                //利用了AppSettings.json文件中的值
+                var msg = Configuration["message"];
 
-            //    await context.Response.WriteAsync(msg);
-            //});
+                await context.Response.WriteAsync(msg);
+            });
+        }
+
+        private void ConfigureRoute(IRouteBuilder routeBuilder)
+        {
+            //在这里配置路由，必须使用IRouteBuilder的参数
+
+            // Home/Index
+            //{controller=Home}/{action=Index}是设置默认控制器和Action，
+            //如果访问的URL无法匹配到路由，则请求会进入下一个中间件而不会进入app.UseMvc(ConfigureRoute)
+            routeBuilder.MapRoute("Default", "{controller=Home}/{action=Index}/{id?}");
         }
     }
 }
