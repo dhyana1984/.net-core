@@ -1,0 +1,11 @@
+﻿@* 视图导入文件，编写一些 C# 代码，和放置常规的指令来引入视图所需要的命名空间 *@
+
+@namespace HelloWorld.Views
+@*
+    addTagHelper是注册标签助手，*是导入程序集的标签助手，第二个参数是导入哪个程序集，
+    这两个参数放在一起就是导入程序集Microsoft.AspNetCore.Mvc.TagHelpers的所有标签助手
+
+*@
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@using HelloWorld.Controllers
+@using HelloWorld.Models

@@ -1,13 +1,59 @@
-﻿@* 不需要声明Model类型了 *@
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Home 控制器下的Index方法</title>
-    </head>
-<body>
-    <h1>欢迎！</h1>
-    <div>这个消息来自于Home控制器下的Index的视图文件 index.cshtml</div>
-    <div>@Model.Name</div>
-</body>
+﻿@model HomeController.HomePageViewModel
+@{ 
+    ViewBag.Title = "Home 控制器下的Index方法";
+   
+}
+<style>
+    body {
+        margin: 10px auto;
+        text-align: center
+    }
 
-</html>
+    table {
+        margin: 0 auto;
+        width: 90%
+    }
+
+    table, th, td {
+        border: 1px solid #eee;
+        border-collapse: collapse;
+        border-spacing: 0;
+        padding: 5px;
+        text-align: center
+    }
+
+    .txt-left {
+        text-align: left;
+    }
+</style>
+    <h1>职工列表！</h1>
+    <div>这个消息来自于Home控制器下的Index的视图文件 index.cshtml</div>
+    <table>
+    <tr>
+        <th>
+            ID
+        </th>
+        <td>
+            Name
+        </td>
+        <th class="txt-left">
+            操作
+        </th>
+    </tr>
+        @foreach (var item in Model.Employees)
+        {
+            <tr>
+                <td>
+                    
+                    @item.ID
+                </td>
+                <td>
+                    @item.Name
+                </td>
+                <td class="txt-left">
+                    <a asp-action="Detail" asp-route-ID="@item.ID">详情</a>&nbsp;
+                        <a asp-controller="Home" asp-action="Edit" asp-route-ID="@item.ID">编辑</a>
+                </td>
+            </tr>
+        }
+    </table>

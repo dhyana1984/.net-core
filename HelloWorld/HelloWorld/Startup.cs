@@ -11,11 +11,15 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Microsoft.AspNetCore.Routing;
+using HelloWorld.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace HelloWorld
 {
     public class Startup
     {
+        
         public IConfiguration Configuration { get; set; }
 
         public Startup()
@@ -30,6 +34,11 @@ namespace HelloWorld
         {
             //添加MVC服务，才能使用MVC的Controller
             services.AddMvc();
+
+            //添加EF服务，设置DBContext
+            //Configuration["database:connection"]是字典，读取的AppSettings.json文件中的内容
+            services.AddEntityFrameworkSqlite().AddDbContext<HelloWorldDBContext>
+                (options => options.UseSqlite(Configuration["database:connection"]));
         }
 
         /*
@@ -75,17 +84,17 @@ namespace HelloWorld
              * app.Run() 方法中注册的中间件还可以访问 Response，例如使用 Response 对象返回一个字符串
              * 如果在 app.Run() 方法之后注册另一个中间件，那么注册的那个中间件永远不会被调用，因为 Run() 方法是注册中间件的终端，在它之后，永远不会调用下一个中间件
              */
-            app.Run(async (context) =>
-            {
-                //throw new Exception("Throw Exception");
+            //app.Run(async (context) =>
+            //{
+            //    //throw new Exception("Throw Exception");
 
-                //await context.Response.WriteAsync("Hello World! 简单教程");
+            //    //await context.Response.WriteAsync("Hello World! 简单教程");
 
-                //利用了AppSettings.json文件中的值
-                var msg = Configuration["message"];
+            //    //利用了AppSettings.json文件中的值
+            //    var msg = Configuration["message"];
 
-                await context.Response.WriteAsync(msg);
-            });
+            //    await context.Response.WriteAsync(msg);
+            //});
         }
 
         private void ConfigureRoute(IRouteBuilder routeBuilder)
