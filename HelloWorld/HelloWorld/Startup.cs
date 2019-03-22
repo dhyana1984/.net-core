@@ -13,7 +13,7 @@ using System.Text.Unicode;
 using Microsoft.AspNetCore.Routing;
 using HelloWorld.Models;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Identity;
 
 namespace HelloWorld
 {
@@ -39,6 +39,16 @@ namespace HelloWorld
             //Configuration["database:connection"]是字典，读取的AppSettings.json文件中的内容
             services.AddEntityFrameworkSqlite().AddDbContext<HelloWorldDBContext>
                 (options => options.UseSqlite(Configuration["database:connection"]));
+
+            //添加Identity服务
+            /*
+             AddIdentity() 方法需要传递两个范型参数: 用户实体的类型和角色实体的类型，
+             这两个范型类型分别是我们刚刚创建的 User 类和一个用户角色类，我们默认使用 Microsoft.AspNetCore.Identity 命名空间下的 IdentityRole
+             为了在 Identity 框架中使用 EF 框架，我们需要使用 AddEntityFrameworkStores() 方法来使用 EF 框架存储数据
+             AddEntityFrameworkStores() 会自动配置 UserStore 这样的服务，用于创建用户和验证其密码
+             */
+            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<HelloWorldDBContext>();
+
         }
 
         /*
@@ -64,14 +74,21 @@ namespace HelloWorld
             //静态文件放到wwwroot文件夹下面
             app.UseFileServer();
 
+            /*配置identity中间件
+             * identity中间件插入的位置非常重要，不能插入的太晚，否则没有机会处理请求
+             * 如果要在MVC控制器中进行授权检查，需要在MVC中间件之前插入，确保cookie和401错误得到成功处理
+            */
+            app.UseAuthentication();
+
             //app.UseMvcWithDefaultRoute() 给了一个默认的路由规则，允许我们访问 HomeController
             //app.UseMvcWithDefaultRoute();
             app.UseMvc(ConfigureRoute);
 
-            //UseDefaultFiles 中间件会检查传入的请求并检查它是否用于目录的根目录，以及是否有任何匹配的默认文件
-            //可以自己重写UseDefaultFiles的默认文件index.html默认是是默认文件之一
-            //app.UseDefaultFiles();
-            //UseStaticFiles中间件会让请求寻找wwwroot下的静态文件，如果没有文件就进入下一个中间件
+            /*UseDefaultFiles 中间件会检查传入的请求并检查它是否用于目录的根目录，以及是否有任何匹配的默认文件
+            *可以自己重写UseDefaultFiles的默认文件index.html默认是是默认文件之一
+            *app.UseDefaultFiles();
+            *UseStaticFiles中间件会让请求寻找wwwroot下的静态文件，如果没有文件就进入下一个中间件
+            */
             //app.UseStaticFiles();
 
 

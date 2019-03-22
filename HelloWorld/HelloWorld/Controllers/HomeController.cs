@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HelloWorld.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly HelloWorldDBContext _context;
@@ -51,7 +53,7 @@ namespace HelloWorld.Controllers
                 return _context.Employees.ToList<Employee>();
             }
         }
-
+        [AllowAnonymous]
         public ViewResult Index()
         {
             var model = new HomePageViewModel();
@@ -93,6 +95,7 @@ namespace HelloWorld.Controllers
             return View(employee);
         }
 
+  
         [HttpPost]
         public IActionResult Edit(int id, EmployeeEditViewModel input)
         {
@@ -107,6 +110,27 @@ namespace HelloWorld.Controllers
             }
             return View(employee);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Create(EmployeeEditViewModel model)
+        {
+            SQLEmployeeData sqlData = new SQLEmployeeData(_context);
+            if(ModelState.IsValid)
+            {
+                var employee = new Employee();
+                employee.Name=model.Name;
+                sqlData.Add(employee);
+                _context.SaveChanges();
+                return RedirectToAction("Detail", new { id = employee.ID });
+            }
+            return View();
+        }
+
 
         public class HomePageViewModel
         {
