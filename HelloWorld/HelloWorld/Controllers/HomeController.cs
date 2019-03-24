@@ -132,15 +132,16 @@ namespace HelloWorld.Controllers
         }
 
 
-        public class HomePageViewModel
-        {
-            public IEnumerable<Employee> Employees { get; set; }
-        }
+    }
 
-        public class EmployeeEditViewModel
-        {
-            [Required, MaxLength(80)]
-            public string Name { get; set; }
-        }
+    public class HomePageViewModel
+    {
+        public IEnumerable<Employee> Employees { get; set; }
+    }
+
+    public class EmployeeEditViewModel
+    {
+        [Required, MaxLength(80)]
+        public string Name { get; set; }
     }
 }

@@ -36,9 +36,26 @@ namespace HelloWorld
             services.AddMvc();
 
             //添加EF服务，设置DBContext
+
+            /*
+             * 第一种配置方法，这种方法需要我们的 HelloWorldDBContext 有一个可以接受 DbContextOptions<HelloWorldDBContext> 类型参数的构造函数
+             * public HelloWorldDBContext(DbContextOptions<HelloWorldDBContext> options) : base(options)  
+                { 
+                }
+             */
             //Configuration["database:connection"]是字典，读取的AppSettings.json文件中的内容
-            services.AddEntityFrameworkSqlite().AddDbContext<HelloWorldDBContext>
-                (options => options.UseSqlite(Configuration["database:connection"]));
+            //services.AddEntityFrameworkSqlite().AddDbContext<HelloWorldDBContext>
+            //    (options => options.UseSqlite(Configuration["database:connection"]));
+
+            /*
+             * 第二种配置方法需要在 HelloWorldDBContext 类中重写方法 OnConfiguring
+             * protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+                { 
+                    optionsBuilder.UseSqlite("Data Source=blogging.db"); 
+                }
+             */
+             
+            services.AddEntityFrameworkSqlite().AddDbContext<HelloWorldDBContext>();//当前使用第二种配置EF的办法
 
             //添加Identity服务
             /*
