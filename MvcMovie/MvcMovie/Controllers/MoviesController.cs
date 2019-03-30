@@ -19,11 +19,34 @@ namespace MvcMovie.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Movie.ToListAsync());
-        }
+        //按title搜索电影
+        //public async Task<IActionResult> Index(string searchString)
+        //{
+        //    var movies = from m in _context.Movie select m;
+        //    if(!string.IsNullOrEmpty(searchString))
+        //    {
+        //        //t.Title.Contains(searchString)是个延迟查询，会在 movies.ToListAsync()时才执行
+        //        //Contains在数据库上运行，而不是在C#中运行
+        //        movies = movies.Where(t => t.Title.Contains(searchString));
+        //    }
+        //    return View(await movies.ToListAsync());
+        //}
 
+        public async Task<IActionResult> Index(string movieGenre, string searchString)
+        {
+            IQueryable<string> genreQuery = from m in _context.Movie orderby m.Genre select m.Genre;
+            var movies = from m in _context.Movie select m;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                movies = movies.Where(t => t.Title.Contains(searchString));
+            }
+            if (!string.IsNullOrEmpty(movieGenre))
+            {
+                movies = movies.Where(t => t.Genre.Contains(movieGenre));
+            }
+
+        }
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)
         {

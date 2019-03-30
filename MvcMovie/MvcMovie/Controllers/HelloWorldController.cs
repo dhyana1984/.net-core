@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +13,11 @@ namespace MvcMovie.Controllers
     public class HelloWorldController : Controller
     {
       
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            ViewBag.Test = "abc";
+            var result = await GetData();
+            ViewBag.Test = result;
             return View();
         }
 
@@ -25,6 +29,12 @@ namespace MvcMovie.Controllers
             ViewBag.Message = "Hello " + name;
             ViewBag.NumTimes = numTimes;
             return View();
+        }
+
+        private async Task<string> GetData()
+        {
+            await Task.Delay(5000);
+            return "bbbbbb";
         }
     }
 }
