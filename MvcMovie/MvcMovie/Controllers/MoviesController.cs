@@ -34,17 +34,28 @@ namespace MvcMovie.Controllers
 
         public async Task<IActionResult> Index(string movieGenre, string searchString)
         {
+            //获取电影流派
             IQueryable<string> genreQuery = from m in _context.Movie orderby m.Genre select m.Genre;
             var movies = from m in _context.Movie select m;
 
+            //根据关键字和电影流派检索
             if (!string.IsNullOrEmpty(searchString))
             {
                 movies = movies.Where(t => t.Title.Contains(searchString));
             }
             if (!string.IsNullOrEmpty(movieGenre))
             {
-                movies = movies.Where(t => t.Genre.Contains(movieGenre));
+                movies = movies.Where(t => t.Genre == movieGenre);
             }
+
+            var movieGenreVM = new MovieGenreViewModel
+            {
+                //讲电影流派去重并且放入ViewModel作为下拉框选项
+                Genres = new SelectList(await genreQuery.Distinct().ToListAsync()),
+                Movies = await movies.ToListAsync()
+            };
+
+            return View(movieGenreVM);
 
         }
         // GET: Movies/Details/5
