@@ -66,6 +66,7 @@ namespace MvcMovie.Controllers
                 return NotFound();
             }
 
+            // FirstOrDefaultAsync该方法中内置的一个重要安全功能是，代码会先验证搜索方法已经找到电影，然后再执行操作
             var movie = await _context.Movie
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (movie == null)
@@ -82,12 +83,10 @@ namespace MvcMovie.Controllers
             return View();
         }
 
-        // POST: Movies/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,ReleaseDate,Genre,Price")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -118,9 +117,10 @@ namespace MvcMovie.Controllers
         // [Bind] 特性是防止过度发布的一种方法。 只应在 [Bind] 特性中包含想要更改的属性。 
         //ValidateAntiForgeryToken 特性用于防止请求伪造，并与编辑视图文件(Views/Movies/Edit.cshtml) 中生成的防伪标记相配对。
         //[ValidateAntiForgeryToken] 特性验证表单标记帮助程序中的防伪标记生成器生成的隐藏的 XSRF 标记
+        //如果Movie类的字段变化了，需要修改Bind的字段
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
         {
             if (id != movie.Id)
             {
