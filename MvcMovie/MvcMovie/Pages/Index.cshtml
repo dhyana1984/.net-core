@@ -13,13 +13,14 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
-<form  method="post">
+<form >
     <p>
         <select asp-for="MovieGenre" asp-items="Model.Genres">
             <option value="">All</option>
         </select>
         Title:<input asp-for="SearchString" />
-        <input type="submit" value="Filter" asp-page-handler="SearchMovie"/>
+        @* 如果是提交到别的OnPost，需要加上asp-page-handler="SearchMovie" *@
+        <input type="submit" value="Filter" />
     </p>
 
 </form>

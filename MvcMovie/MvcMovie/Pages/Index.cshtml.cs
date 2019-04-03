@@ -31,9 +31,10 @@ namespace MvcMovie.Pages
         public IList<Movie> Movies;
         public SelectList Genres;
         //[BindProperty] 特性来选择加入模型绑定。在页面上可以直接用此属性绑定，否则不会绑定
-        [BindProperty]
+        // 会绑定名称与属性相同的表单值和查询字符串。 在 GET 请求中进行绑定需要 (SupportsGet = true)
+        [BindProperty(SupportsGet =true)]
         public string MovieGenre { get; set; }
-        [BindProperty]
+        [BindProperty(SupportsGet = true)]
         public string SearchString { get; set; }
   
         [BindProperty]
@@ -41,10 +42,20 @@ namespace MvcMovie.Pages
       
         public async Task OnGetAsync()
         {
-
-            Movies = await _context.Movie.ToListAsync();
-            Message = Movies.Count.ToString();
+            var movies = from m in _context.Movie select m;
+            //检索后需要重新绑定Genres
             IQueryable<string> genreQuery = from m in _context.Movie orderby m.Genre select m.Genre;
+            //根据关键字和电影流派检索
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                movies = movies.Where(t => t.Title.Contains(SearchString));
+            }
+            if (!string.IsNullOrEmpty(MovieGenre))
+            {
+                movies = movies.Where(t => t.Genre == MovieGenre);
+            }
+            Movies = await movies.ToListAsync();
+            
             Genres = new SelectList(await genreQuery.Distinct().ToListAsync());
         }
 
