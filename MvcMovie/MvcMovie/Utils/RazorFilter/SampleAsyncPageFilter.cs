@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,25 @@ namespace MvcMovie.Utils.RazorFilter
 {
     public class SampleAsyncPageFilter : IAsyncPageFilter
     {
-        public Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+        private readonly ILogger _logger;
+
+        public SampleAsyncPageFilter(ILogger logger)
         {
-            throw new NotImplementedException();
+            this._logger = logger;
+        }
+        //Handle Method选择之后，模型绑定发生之前，异步调用
+        public async Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
+        {
+            _logger.LogDebug("Global OnPageHandlerSelectionAsync called.");
+            await Task.CompletedTask;
         }
 
-        public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
+        //Handle Method invole之前，模型绑定之后，异步调用
+        public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug("Global OnPageHandlerExecutionAsync called.");
+            await next.Invoke();
         }
+  
     }
 }

@@ -3,20 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MvcMovie.Models;
+using MvcMovie.Utils.RazorFilter;
 
 namespace MvcMovie.Pages
 {
+    [AddHeader("Author", "Rick")]
     public class IndexModel : PageModel
     {
+        private readonly ILogger _logger;
         private readonly MvcMovie.Models.MvcMovieContext _context;
 
-        public IndexModel(MvcMovie.Models.MvcMovieContext context)
+        public IndexModel(MvcMovie.Models.MvcMovieContext context, ILogger<IndexModel> logger)
         {
             _context = context;
+            _logger = logger;
         }
         //在Razor页面中没有ViewBag
         //属性上加了ViewData，可以在_Layout中以ViewData["TestProperty"]的方式读取数据
@@ -79,6 +85,28 @@ namespace MvcMovie.Pages
             Genres = new SelectList(await genreQuery.Distinct().ToListAsync());
 
 
+        }
+
+
+        //通过重写筛选器方法实现 Razor 页面筛选器
+        public override void OnPageHandlerSelected(
+                                 PageHandlerSelectedContext context)
+        {
+            _logger.LogDebug("IndexModel/OnPageHandlerSelected");
+        }
+
+        public override void OnPageHandlerExecuting(
+                                    PageHandlerExecutingContext context)
+        {
+            Message = "Message set in handler executing";
+            _logger.LogDebug("IndexModel/OnPageHandlerExecuting");
+        }
+
+
+        public override void OnPageHandlerExecuted(
+                                    PageHandlerExecutedContext context)
+        {
+            _logger.LogDebug("IndexModel/OnPageHandlerExecuted");
         }
     }
 }

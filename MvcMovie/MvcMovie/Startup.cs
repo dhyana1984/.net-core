@@ -11,18 +11,24 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Models;
+using MvcMovie.Utils.RazorFilter;
+using Microsoft.Extensions.Logging;
+using MvcMovie.Utils.Filter;
 
 namespace MvcMovie
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private ILogger _logger;
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
+            _logger = loggerFactory.CreateLogger<GlobalFiltersLogger>();
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -34,7 +40,11 @@ namespace MvcMovie
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options => 
+                {
+                    //注册自定义的RazorPage filter
+                    options.Filters.Add(new SampleAsyncPageFilter(_logger));
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             //MvcMovieContext 对象处理连接到数据库并将 Movie 对象映射到数据库记录的任务。 
             //在 Startup.cs 文件的 ConfigureServices 方法中向依赖关系注入容器注册数据库上下文：
